@@ -5,11 +5,16 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
+)
+
+var (
+	g_ip           = flag.String("ip", "", "ip to lookup")
+	g_redis_server = flag.String("redis", "", "redis server to hook into")
 )
 
 type Response struct {
@@ -28,50 +33,53 @@ type Response struct {
 }
 
 func main() {
-	var ip string
-	flag.StringVar(&ip, "ip", "", "IP to lookup")
-
-	var redisHost string
-	flag.StringVar(&redisHost, "redis", "", "Redis host to connect to")
-
 	flag.Parse()
 
-	if response, err := http.Get("http://freegeoip.net/json/" + ip); err != nil {
-		fmt.Println(err)
-		return
+	addr := fmt.Sprintf("http://freegeoip.net/json/%s", *g_ip)
+	httpResponse, err := http.Get(addr)
+	if err != nil {
+		log.Fatal(err)
 	}
-	defer response.Body.Close()
+	defer httpResponse.Body.Close()
 
-	if jsonData, err := ioutil.ReadAll(response.Body); err != nil {
-		fmt.Println(err)
-		return
+	jsonData, err := ioutil.ReadAll(httpResponse.Body)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	res := Response{}
-	json.Unmarshal(jsonData, &res)
-
-	if c, err := redis.Dial("tcp", redisHost); err != nil {
-		fmt.Println(err)
-		return
+	response := Response{}
+	if err := json.Unmarshal(jsonData, &response); err != nil {
+		log.Fatal(err)
 	}
-	defer c.Close()
+
+	connection, err := redis.Dial("tcp", *g_redis_server)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer connection.Close()
 
 	now := time.Now()
 	secs := now.Unix()
 
-	res.TimeStamp = secs
+	response.TimeStamp = secs
 
-	if result1, err := json.Marshal(res); err != nil {
-		fmt.Println(err)
-		return
+	request, err := json.Marshal(response)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	key := "badfriend:" + strconv.FormatInt(res.TimeStamp, 10)
+	key := fmt.Sprintf("badfriend:%d", response.TimeStamp)
 
-	c.Send("MULTI")
-	c.Send("SET", key, string(result1))
-	c.Send("SADD", "barfriends", res.TimeStamp)
-	if _, err := c.Do("EXEC"); err != nil {
-		fmt.Println(err)
+	if err := connection.Send("MULTI"); err != nil {
+		log.Fatal(err)
+	}
+	if err := connection.Send("SET", key, string(request)); err != nil {
+		log.Fatal(err)
+	}
+	if err := connection.Send("SADD", "badfriends", response.TimeStamp); err != nil {
+		log.Fatal(err)
+	}
+	if _, err := connection.Do("EXEC"); err != nil {
+		log.Fatal(err)
 	}
 }
