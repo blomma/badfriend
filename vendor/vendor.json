@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "LkMTNEcMHUPSti0AsNHJKNr/B5E=",
+			"path": "github.com/mediocregopher/radix.v2/redis",
+			"revision": "1ac54a28f5934ea5e08f588647e734aba2383cb8",
+			"revisionTime": "2017-01-22T22:44:36Z"
+		}
+	],
+	"rootPath": "github.com/blomma/badfriend"
+}
