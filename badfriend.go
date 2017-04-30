@@ -18,7 +18,7 @@ var (
 )
 
 type geoipResponse struct {
-	Ip          string  `json:"ip"`
+	IP          string  `json:"ip"`
 	CountryCode string  `json:"country_code"`
 	CountryName string  `json:"country_name"`
 	RegionCode  string  `json:"region_code"`
