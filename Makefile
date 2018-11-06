@@ -1,5 +1,3 @@
-.PHONY: clean
-
 MAJOR_VERSION = 1
 MINOR_VERSION = $(shell git rev-list master --count)
 PATCH_VERSION = 0
@@ -18,7 +16,8 @@ EXECUTABLES = \
 
 EXECUTABLE_TARGETS = $(EXECUTABLES:%=bin/%)
 
-all: clean
+all:
+	clean
 	$(MAKE) $(EXECUTABLE_TARGETS)
 
 # arm
@@ -34,4 +33,10 @@ bin/linux-amd64-$(EXECUTABLE):
 clean:
 	rm -rf bin
 
-.PHONY: clean release install
+# Docker
+DOCKER_IMAGE = linux-arm-7-badfriend
+
+docker-build:
+	docker build --pull -t $(DOCKER_IMAGE):$(shell ./bin/linux-arm-7-badfriend --version) .
+
+.PHONY: clean all
