@@ -46,7 +46,7 @@ type geoResponse struct {
 	TimeStamp   int64
 }
 
-func badRobotsHandler(w http.ResponseWriter, r *http.Request) {
+func badFriendHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
@@ -140,7 +140,7 @@ func main() {
 	db = geoDB
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/badrobots", badRobotsHandler)
+	mux.HandleFunc("/badfriend", badFriendHandler)
 
 	srv := &http.Server{
 		Handler:      logHandler(mux),
