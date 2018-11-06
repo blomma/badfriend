@@ -19,7 +19,9 @@ import (
 // Version is the version number or commit hash
 // These variables should be set by the linker when compiling
 var (
-	Version = "0.0.0"
+	Version     = "0.0.0"
+	CommitHash  = "Unknown"
+	CompileDate = "Unknown"
 )
 
 // Options
@@ -105,14 +107,6 @@ func badFriendHandler(w http.ResponseWriter, r *http.Request) {
 	if err := client.PipeResp().Err; err != nil {
 		log.Fatal(err)
 	}
-
-	// fmt.Printf("City name: %v\n", record.City.Names["en"])
-	// fmt.Printf("Continent name: %v\n", record.Continent.Names["en"])
-	// fmt.Printf("Country name: %v\n", record.Country.Names["en"])
-	// fmt.Printf("Coordinates: %v, %v\n", record.Location.Latitude, record.Location.Longitude)
-	// fmt.Printf("Postal: %v \n", record.Postal.Code)
-	// fmt.Printf("ISO country code: %v\n", record.Country.IsoCode)
-	// fmt.Printf("Time zone: %v\n", record.Location.TimeZone)
 }
 
 func logHandler(next http.Handler) http.Handler {
@@ -159,6 +153,10 @@ func main() {
 		}
 		os.Exit(1)
 	}()
+
+	log.Println("Version:", Version)
+	log.Println("Commit hash:", CommitHash)
+	log.Println("Compiled on:", CompileDate)
 
 	log.Fatal(srv.ListenAndServe())
 }
