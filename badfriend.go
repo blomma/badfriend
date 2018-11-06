@@ -22,10 +22,15 @@ var (
 	Version = "0.0.0"
 )
 
+// Options
 var (
-	redisServer = flag.String("redis", "", "redis server to hook into")
-	db          *geoDB
+	flagRedis   = flag.String("redis", "", "redis server to hook into")
 	flagVersion = flag.Bool("version", false, "Show the version number and information")
+)
+
+// Global variables
+var (
+	db *geoDB
 )
 
 type geoResponse struct {
@@ -70,7 +75,7 @@ func badRobotsHandler(w http.ResponseWriter, r *http.Request) {
 		TimeStamp:   time.Now().Unix(),
 	}
 
-	client, err := redis.Dial("tcp", *redisServer)
+	client, err := redis.Dial("tcp", *flagRedis)
 	if err != nil {
 		log.Fatal(err)
 	}
