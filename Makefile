@@ -16,8 +16,7 @@ EXECUTABLES = \
 
 EXECUTABLE_TARGETS = $(EXECUTABLES:%=bin/%)
 
-all:
-	clean
+all: clean
 	$(MAKE) $(EXECUTABLE_TARGETS)
 
 # arm
