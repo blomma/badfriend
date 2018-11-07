@@ -21,7 +21,8 @@ EXECUTABLES = \
 
 EXECUTABLE_TARGETS = $(EXECUTABLES:%=bin/%)
 
-all: clean
+all:
+    $(MAKE) clean
 	$(MAKE) $(EXECUTABLE_TARGETS)
 
 # arm
@@ -40,10 +41,18 @@ clean:
 # Docker
 DOCKER_IMAGE = linux-arm-7-badfriend
 
+docker-clean:
+	docker stop badfriend && docker rm badfriend
+
 docker-build:
 	docker build --pull -t $(DOCKER_IMAGE):$(shell ./bin/linux-arm-7-badfriend --version) .
 
 docker-run:
 	sudo docker run -p 8000:8000 --link redis:redis  --restart always --name badfriend -d $(DOCKER_IMAGE):$(shell ./bin/linux-arm-7-badfriend --version) /linux-arm-7-badfriend --redis redis:6379
+
+docker-deploy:
+    $(MAKE) docker-build
+    $(MAKE) docker-clean
+    $(MAKE) docker-run
 
 .PHONY: clean all
