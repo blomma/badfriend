@@ -67,7 +67,7 @@ func fetchGeo(g *geoDB) {
 
 		timerChan := make(chan struct{})
 		go func() {
-			<-time.After(24 * time.Hour)
+			<-time.After(360 * time.Hour)
 			close(timerChan)
 		}()
 

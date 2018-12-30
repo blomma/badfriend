@@ -9,9 +9,9 @@ DATE = $(shell go run tools/build-date.go)
 
 # build flags
 BUILD_FLAGS = -ldflags "-s -w \
-	-X main.Version=$(VERSION)" \
+	-X main.Version=$(VERSION) \
 	-X main.CommitHash=$(HASH) \
-	-X 'main.CompileDate=$(DATE)'
+	-X 'main.CompileDate=$(DATE)'"
 
 EXECUTABLE = badfriend
 EXECUTABLES = \
@@ -22,7 +22,7 @@ EXECUTABLES = \
 EXECUTABLE_TARGETS = $(EXECUTABLES:%=bin/%)
 
 all:
-    $(MAKE) clean
+	$(MAKE) clean
 	$(MAKE) $(EXECUTABLE_TARGETS)
 
 # arm
@@ -51,8 +51,8 @@ docker-run:
 	sudo docker run -p 8000:8000 --link redis:redis  --restart always --name badfriend -d $(DOCKER_IMAGE):$(shell ./bin/linux-arm-7-badfriend --version) /linux-arm-7-badfriend --redis redis:6379
 
 docker-deploy:
-    $(MAKE) docker-build
-    $(MAKE) docker-clean
-    $(MAKE) docker-run
+	$(MAKE) docker-build
+	$(MAKE) docker-clean
+	$(MAKE) docker-run
 
 .PHONY: clean all
